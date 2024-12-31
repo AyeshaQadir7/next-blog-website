@@ -13,8 +13,3 @@ export interface fullBlog {
   titleImage: any;
 }
 
-export interface BlogArticleProps {
-  params: {
-    slug: string;
-  };
-}

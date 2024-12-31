@@ -3,25 +3,34 @@ import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { fullBlog } from "@/sanity/lib/interface";
 import { PortableText } from "next-sanity";
-import { BlogArticleProps } from "@/sanity/lib/interface";
 import Image from "next/image";
 
+// Function to fetch data based on the slug
 async function getData(slug: string) {
   const query = `
     *[_type == "blog" && slug.current == '${slug}' ]{
-  "currentSlug": slug.current,
-    title,
-    content,
-    titleImage
-}[0]`;
+      "currentSlug": slug.current,
+      title,
+      content,
+      titleImage
+    }[0]`;
 
   const data = await client.fetch(query);
   return data;
 }
 
-export default async function BlogArticle({ params }: BlogArticleProps) {
-  const data: fullBlog = await getData(params.slug);
-  console.log(data);
+// Page component receiving the params as a Promise type
+export default async function BlogArticle({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  // Await the params and extract the slug
+  const { slug } = await params;
+
+  // Fetch the data based on the slug
+  const data: fullBlog = await getData(slug);
+
   return (
     <div className="mt-8">
       <h1>
@@ -42,7 +51,7 @@ export default async function BlogArticle({ params }: BlogArticleProps) {
         className="rounded-lg mt-8 border-slate-950 "
       />
 
-      <div className=" my-10 prose prose-lg dark:prose-invert prose-li:marker:text-primary prose-a:text-primary">
+      <div className="my-10 prose prose-lg dark:prose-invert prose-li:marker:text-primary prose-a:text-primary">
         <PortableText
           value={data.content}
           components={{
@@ -61,7 +70,7 @@ export default async function BlogArticle({ params }: BlogArticleProps) {
         />
       </div>
 
-      <Comments postId={params.slug} />
+      <Comments postId={""} />
     </div>
   );
 }
